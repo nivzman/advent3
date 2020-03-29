@@ -1,4 +1,6 @@
 use std::error;
+use std::fmt;
+use std::io;
 
 #[derive(Debug)]
 pub struct MyError {
@@ -11,8 +13,16 @@ impl MyError {
     }
 }
 
-impl<T: error::Error> From<T> for MyError {
-    fn from(error: T) -> Self {
+impl error::Error for MyError {}
+
+impl fmt::Display for MyError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.msg)
+    }
+}
+
+impl From<io::Error> for MyError {
+    fn from(error: io::Error) -> Self {
         MyError { msg: String::from(error.to_string())}
     }
 }
