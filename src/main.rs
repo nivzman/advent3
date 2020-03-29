@@ -29,7 +29,7 @@ fn main() -> Result<(), MyError> {
         return Ok(());
     }
 
-    let closest = point::get_closest(intersections).unwrap();
+    let closest = point::get_closest(intersections.into_iter()).unwrap();
     println!("{:?}", closest.manhaten_distance());
     return Ok(())
 }

@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 
 use crate::line::Line;
 
@@ -28,24 +27,22 @@ impl Point {
 }
 
 
-pub fn get_closest(points: HashSet<Point>) -> Option<Point> {
-    if points.is_empty() {
-        return None;
-    }
+pub fn get_closest<I>(mut points: I) -> Option<Point>
+        where I: Iterator<Item = Point> {
 
-    let mut min_distance: u32 = u32::max_value();
-    let mut min_point: Option<&Point> = None;
+    let mut min_point = points.next()?;
+    let mut min_distance = min_point.manhaten_distance();
 
-    for p in points.iter() {
+    for p in points {
         if p.x == 0 && p.y == 0 {
             continue;
         }
         let d = p.manhaten_distance();
         if d < min_distance {
             min_distance = d;
-            min_point = Some(&p);
+            min_point = p;
         }
     }
 
-    Some(min_point.unwrap().clone())
+    Some(min_point)
 }
