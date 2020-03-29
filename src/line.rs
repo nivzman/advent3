@@ -11,10 +11,9 @@ enum LineOrientation {
 }
 
 pub struct Line {
-    state: LineOrientation,
-    start_pos: Point,
+    orientation: LineOrientation,
+    start: Point,
     len: usize,
-    current_pos: usize,
 }
 
 impl Line {
@@ -23,7 +22,7 @@ impl Line {
             return Err(MyError::new("identical points can not make a line"));
         }
 
-        let (state, start_pos, len) = if start.x == end.x {
+        let (orientation, start, len) = if start.x == end.x {
             (LineOrientation::Vertical,
              Point::new(start.x, min(start.y, end.y)),
              (end.y - start.y).abs() as usize)
@@ -37,43 +36,51 @@ impl Line {
 
         Ok(
             Line {
-                state,
-                start_pos,
+                orientation,
+                start,
                 len,
-                current_pos: 0,
             }
         )
     }
 
     pub fn is_on(&self, point: &Point) -> bool {
-        let d = match self.state {
+        let d = match self.orientation {
             LineOrientation::Horizontal => {
-                if point.y != self.start_pos.y {
+                if point.y != self.start.y {
                     return false;
                 }
-                point.x - self.start_pos.x
+                point.x - self.start.x
             },
             LineOrientation::Vertical => {
-                if point.x != self.start_pos.x {
+                if point.x != self.start.x {
                     return false;
                 }
-                point.y - self.start_pos.y
+                point.y - self.start.y
             }
         };
         d >= 0 && d as usize <= self.len
     }
+
+    pub fn iter(&self) -> LineIter {
+        LineIter { _ref: self, current_pos: 0}
+    }
 }
 
-impl Iterator for Line {
+pub struct LineIter<'a> {
+    _ref: &'a Line,
+    current_pos: usize,
+}
+
+impl Iterator for LineIter<'_> {
     type Item = Point;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current_pos > self.len {
+        if self.current_pos > self._ref.len {
             return None;
         }
 
-        let mut p = self.start_pos.clone();
-        match self.state {
+        let mut p = self._ref.start.clone();
+        match self._ref.orientation {
             LineOrientation::Horizontal => p.x += self.current_pos as i32,
             LineOrientation::Vertical => p.y += self.current_pos as i32,
         }
@@ -82,6 +89,7 @@ impl Iterator for Line {
         Some(p)
     }
 }
+
 
 
 pub fn transform(path: Vec<path::PathElement>) -> Vec<Line> {

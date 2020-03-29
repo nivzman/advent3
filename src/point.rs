@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::line::Line;
 
-#[derive(Hash, Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Hash, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -13,7 +13,7 @@ impl Point {
         Point {x, y}
     }
 
-    pub fn is_on_path(&self, path: &Vec<Line>) -> bool {
+    pub fn is_on_path(&self, path: &[Line]) -> bool {
         for line in path.iter() {
             if line.is_on(self) {
                 return true;

@@ -46,10 +46,7 @@ impl PathElement {
 }
 
 pub fn parse_input(input_file: &str) -> Result<(Vec<PathElement>, Vec<PathElement>), MyError> {
-    let content = match fs::read_to_string(input_file) {
-        Ok(val) => val,
-        Err(_) => return Err(MyError::new("could not read input file")),
-    };
+    let content = fs::read_to_string(input_file)?;
 
     let paths: Vec<&str> = content.lines().collect();
     if paths.len() != 2 {
@@ -76,7 +73,7 @@ pub fn parse_path(path_data: &str) -> Result<Vec<PathElement>, MyError> {
 pub fn find_intersections(path1: Vec<Line>, path2: Vec<Line>) -> HashSet<Point> {
     let mut crossings: HashSet<Point> = HashSet::new();
     for line in path1 {
-        for point in line {
+        for point in line.iter() {
             if point.is_on_path(&path2) {
                 crossings.insert(point.clone());
             }
