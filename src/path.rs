@@ -5,6 +5,8 @@ use crate::myerror::MyError;
 use crate::line::Line;
 use crate::point::Point;
 
+pub type Path = Vec<Line>;
+
 #[derive(Debug)]
 pub enum Direction {
     Left,

@@ -4,6 +4,7 @@ use crate::point::Point;
 use crate::myerror::MyError;
 use crate::path;
 
+use crate::path::Path;
 
 enum LineOrientation {
     Horizontal,
@@ -92,8 +93,8 @@ impl Iterator for LineIter<'_> {
 
 
 
-pub fn transform(path: Vec<path::PathElement>) -> Vec<Line> {
-    let mut lines: Vec<Line> = Vec::new();
+pub fn transform(path: Vec<path::PathElement>) -> Path {
+    let mut lines: Path = Vec::new();
     let mut current_pos = Point {x: 0, y: 0};
 
     for path_element in path.iter() {
