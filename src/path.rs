@@ -77,19 +77,10 @@ pub fn find_intersections(path1: Vec<Line>, path2: Vec<Line>) -> HashSet<Point> 
     let mut crossings: HashSet<Point> = HashSet::new();
     for line in path1 {
         for point in line {
-            if is_on(&point,&path2) {
+            if point.is_on_path(&path2) {
                 crossings.insert(point.clone());
             }
         }
     }
     crossings
-}
-
-pub fn is_on(point: &Point, path: &Vec<Line>) -> bool {
-    for line in path.iter() {
-        if line.is_on(point) {
-            return true;
-        }
-    }
-    false
 }

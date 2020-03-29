@@ -41,5 +41,5 @@ fn main() {
     }
 
     let closest = point::get_closest(intersections).unwrap();
-    println!("{:?}", point::manhaten_distance(&closest));
+    println!("{:?}", closest.manhaten_distance());
 }
