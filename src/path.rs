@@ -18,6 +18,33 @@ pub struct PathElement {
     pub length: u32,
 }
 
+impl PathElement {
+    pub fn from_str(data: &str) -> Result<PathElement, MyError> {
+        if !data.is_ascii() {
+            return Err(MyError::new("path data must be ascii encoded"));
+        }
+
+        if data.is_empty() {
+            return Err(MyError::new("empty line data found"));
+        }
+
+        let direction: Direction = match data.as_bytes()[0] as char {
+            'U' => Direction::Up,
+            'D' => Direction::Down,
+            'L' => Direction::Left,
+            'R' => Direction::Right,
+            _ => return Err(MyError::new("invalid direction"))
+        };
+
+        let length = match data[1..].parse() {
+            Ok(n) => n,
+            Err(_) => return Err(MyError::new("invalid length"))
+        };
+
+        Ok(PathElement {direction, length})
+    }
+}
+
 pub fn parse_input(input_file: &str) -> Result<(Vec<PathElement>, Vec<PathElement>), MyError> {
     let content = match fs::read_to_string(input_file) {
         Ok(val) => val,
@@ -35,30 +62,12 @@ pub fn parse_input(input_file: &str) -> Result<(Vec<PathElement>, Vec<PathElemen
 }
 
 pub fn parse_path(path_data: &str) -> Result<Vec<PathElement>, MyError> {
-    if !path_data.is_ascii() {
-        return Err(MyError::new("path data must be ascii encoded"));
-    }
-
     let mut parsed:Vec<PathElement> = Vec::new();
     for line_data in path_data.split(',') {
-        if line_data.is_empty() {
-            return Err(MyError::new("empty line data found"));
+        match PathElement::from_str(line_data) {
+            Ok(element) => parsed.push(element),
+            Err(e) => return Err(e),
         }
-
-        let direction: Direction = match line_data.as_bytes()[0] as char {
-            'U' => Direction::Up,
-            'D' => Direction::Down,
-            'L' => Direction::Left,
-            'R' => Direction::Right,
-            _ => return Err(MyError::new("invalid direction"))
-        };
-
-        let length = match line_data[1..].parse() {
-            Ok(n) => n,
-            Err(_) => return Err(MyError::new("invalid length"))
-        };
-
-        parsed.push(PathElement {direction, length});
     }
     Ok(parsed)
 }
