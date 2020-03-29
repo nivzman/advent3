@@ -22,7 +22,7 @@ fn main() -> Result<(), MyError> {
 
     let (path1, path2) = (line::transform(path1), line::transform(path2));
 
-    let intersections = path::find_intersections(path1, path2);
+    let intersections = path::find_intersections(&path1, &path2);
 
     if intersections.is_empty() {
         println!("no crossings");
