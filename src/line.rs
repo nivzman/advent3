@@ -5,16 +5,16 @@ use crate::myerror::MyError;
 use crate::path;
 
 
-enum LineState {
+enum LineOrientation {
     Horizontal,
     Vertical,
 }
 
 pub struct Line {
-    state: LineState,
+    state: LineOrientation,
     start_pos: Point,
-    len: i32,
-    current_pos: i32,
+    len: usize,
+    current_pos: usize,
 }
 
 impl Line {
@@ -24,13 +24,13 @@ impl Line {
         }
 
         let (state, start_pos, len) = if start.x == end.x {
-            (LineState::Vertical,
+            (LineOrientation::Vertical,
              Point::new(start.x, min(start.y, end.y)),
-             (end.y - start.y).abs())
+             (end.y - start.y).abs() as usize)
         } else if start.y == end.y {
-            (LineState::Horizontal,
+            (LineOrientation::Horizontal,
              Point::new(min(start.x, end.x), start.y),
-             (end.x - start.x).abs())
+             (end.x - start.x).abs() as usize)
         } else {
             return Err(MyError::new("line must be horizontal or vertical"));
         };
@@ -47,20 +47,20 @@ impl Line {
 
     pub fn is_on(&self, point: &Point) -> bool {
         let d = match self.state {
-            LineState::Horizontal => {
+            LineOrientation::Horizontal => {
                 if point.y != self.start_pos.y {
                     return false;
                 }
                 point.x - self.start_pos.x
             },
-            LineState::Vertical => {
+            LineOrientation::Vertical => {
                 if point.x != self.start_pos.x {
                     return false;
                 }
                 point.y - self.start_pos.y
             }
         };
-        d >= 0 && d <= self.len
+        d >= 0 && d as usize <= self.len
     }
 }
 
@@ -74,8 +74,8 @@ impl Iterator for Line {
 
         let mut p = self.start_pos.clone();
         match self.state {
-            LineState::Horizontal => p.x += self.current_pos,
-            LineState::Vertical => p.y += self.current_pos,
+            LineOrientation::Horizontal => p.x += self.current_pos as i32,
+            LineOrientation::Vertical => p.y += self.current_pos as i32,
         }
         self.current_pos += 1;
 
