@@ -43,3 +43,87 @@ pub fn get_closest<I, T>(points: I) -> Option<T>
 
     min_point
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::point::{Point, get_closest};
+
+
+    #[test]
+    fn test_closest() {
+        struct TestCase {
+            name: &'static str,
+            points: Vec<(i32, i32)>,
+            expected: Option<Point>,
+        }
+
+        let test_cases = [
+            TestCase {
+                name: "empty",
+                points: vec![],
+                expected: None,
+            },
+            TestCase {
+                name: "sanity",
+                points: vec![(-3, 0), (1, 2), (1, 1), (1, 3)],
+                expected: Some(Point::new(1, 1)),
+            },
+            TestCase {
+                name: "zero point only",
+                points: vec![(0, 0)],
+                expected: None,
+            },
+            TestCase {
+                name: "zero point not returned",
+                points: vec![(0, 0), (1, 1), (2, 2)],
+                expected: Some(Point::new(1, 1)),
+        }
+
+        ];
+
+        for test_case in test_cases.iter() {
+            let mut points: Vec<Point> = Vec::new();
+            for p in test_case.points.iter() {
+                points.push(Point::new(p.0, p.1));
+            }
+
+            assert_eq!(get_closest(points.into_iter()), test_case.expected, "{}", test_case.name);
+        }
+    }
+
+    #[test]
+    fn test_manhaten_distance() {
+        struct TestCase {
+            name: &'static str,
+            p: Point,
+            expected: u32,
+        }
+
+        let test_cases = [
+            TestCase {
+                name: "zero",
+                p: Point::new(0,0),
+                expected: 0,
+            },
+            TestCase {
+                name: "both positive",
+                p: Point::new(4,8),
+                expected: 12,
+            },
+            TestCase {
+                name: "both negative",
+                p: Point::new(-3,-7),
+                expected: 10,
+            },
+            TestCase {
+                name: "one negative one positive",
+                p: Point::new(-3,12),
+                expected: 15,
+            },
+        ];
+
+        for test_case in test_cases.iter() {
+            assert_eq!(test_case.p.manhaten_distance(), test_case.expected, "{}", test_case.name)
+        }
+    }
+}
