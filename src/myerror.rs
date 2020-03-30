@@ -2,7 +2,7 @@ use std::error;
 use std::fmt;
 use std::io;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct MyError {
     pub msg: String,
 }
