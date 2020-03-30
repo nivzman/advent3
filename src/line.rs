@@ -120,7 +120,7 @@ mod tests {
                 expected: Err(MyError::new(LINE_ORIENTATION_ERR)),
             },
             TestCase {
-                name: "SANITY",
+                name: "positive-positive vert line",
                 points: (Point::new(1, 1), Point::new(1, 2)),
                 expected: Ok(Line {
                     orientation: Orientation::Vertical,
@@ -128,10 +128,98 @@ mod tests {
                     len: 1
                 }),
             },
+            TestCase {
+                name: "negative-positive vert line",
+                points: (Point::new(1, -2), Point::new(1, 5)),
+                expected: Ok(Line {
+                    orientation: Orientation::Vertical,
+                    start: Point::new(1, -2),
+                    len: 7
+                }),
+            },
+            TestCase {
+                name: "negative-negative vert line",
+                points: (Point::new(1, -2), Point::new(1, -5)),
+                expected: Ok(Line {
+                    orientation: Orientation::Vertical,
+                    start: Point::new(1, -5),
+                    len: 3
+                }),
+            },
+            TestCase {
+                name: "positive-positive horiz line",
+                points: (Point::new(1, 1), Point::new(3, 1)),
+                expected: Ok(Line {
+                    orientation: Orientation::Horizontal,
+                    start: Point::new(1, 1),
+                    len: 2
+                }),
+            },
+            TestCase {
+                name: "negative-positive horiz line",
+                points: (Point::new(1, 1), Point::new(-9, 1)),
+                expected: Ok(Line {
+                    orientation: Orientation::Horizontal,
+                    start: Point::new(-9, 1),
+                    len: 10
+                }),
+            },
+            TestCase {
+                name: "negative-positive horiz line",
+                points: (Point::new(-6, 1), Point::new(-9, 1)),
+                expected: Ok(Line {
+                    orientation: Orientation::Horizontal,
+                    start: Point::new(-9, 1),
+                    len: 3
+                }),
+            },
         ];
 
         for test_case in test_cases.iter() {
             assert_eq!(Line::new(test_case.points.0, test_case.points.1), test_case.expected, "{}", test_case.name);
+        }
+    }
+
+    #[test]
+    fn test_is_on() {
+        struct TestCase {
+            name: &'static str,
+            line: Line,
+            point: Point,
+            expected: bool,
+        }
+
+        let test_cases = [
+            TestCase {
+                name: "sanity on line",
+                line: Line::new(Point::new(1, 1), Point::new(1, 5)).unwrap(),
+                point: Point::new(1, 3),
+                expected: true,
+            },
+            TestCase {
+                name: "sanity off line",
+                line: Line::new(Point::new(1, 1), Point::new(1, 5)).unwrap(),
+                point: Point::new(1, 6),
+                expected: false,
+            },
+            TestCase {
+                name: "last point included",
+                line: Line::new(Point::new(1, 1), Point::new(1, 5)).unwrap(),
+                point: Point::new(1, 5),
+                expected: true,
+            },
+            TestCase {
+                name: "first point included",
+                line: Line::new(Point::new(1, 1), Point::new(1, 5)).unwrap(),
+                point: Point::new(1, 1),
+                expected: true,
+            },
+            // note: there are a lot off possible test cases to check, I am not going to write them all
+            //       for this is for practice
+        ];
+
+        for test_case in test_cases.iter() {
+            assert_eq!(test_case.line.is_on(&test_case.point), test_case.expected, "{}", test_case.name)
         }
     }
 }
