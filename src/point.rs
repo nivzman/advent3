@@ -1,5 +1,4 @@
-
-use crate::line::Line;
+use std::borrow::Borrow;
 
 #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Point {
@@ -12,37 +11,30 @@ impl Point {
         Point {x, y}
     }
 
-    pub fn is_on_path(&self, path: &[Line]) -> bool {
-        for line in path.iter() {
-            if line.is_on(self) {
-                return true;
-            }
-        }
-        false
-    }
-
     pub fn manhaten_distance(&self) -> u32 {
         self.x.abs() as u32 + self.y.abs() as u32
     }
 }
 
 
-pub fn get_closest<I>(points: I) -> Option<Point>
-        where I: Iterator<Item = Point> {
+pub fn get_closest<I, T>(points: I) -> Option<T>
+        where I: Iterator<Item = T>,
+              T: Borrow<Point> {
 
     let mut points = points.peekable();
     if points.peek().is_none() {
         return None;
     }
 
-    let mut min_point: Option<Point> = None;
+    let mut min_point: Option<T> = None;
     let mut min_distance: u32 = u32::max_value();
 
     for p in points {
-        if p.x == 0 && p.y == 0 {
+        let p2 = p.borrow();
+        if p2.x == 0 && p2.y == 0 {
             continue;
         }
-        let d = p.manhaten_distance();
+        let d = p2.manhaten_distance();
         if d < min_distance {
             min_distance = d;
             min_point = Some(p);

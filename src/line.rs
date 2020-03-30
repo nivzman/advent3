@@ -2,7 +2,6 @@ use std::cmp::min;
 
 use crate::point::Point;
 use crate::myerror::MyError;
-use crate::path::{self, Path};
 
 enum Orientation {
     Horizontal,
@@ -42,19 +41,19 @@ impl Line {
         )
     }
 
-    pub fn is_on(&self, point: &Point) -> bool {
+    pub fn is_on(&self, p: &Point) -> bool {
         let d = match self.orientation {
             Orientation::Horizontal => {
-                if point.y != self.start.y {
+                if p.y != self.start.y {
                     return false;
                 }
-                point.x - self.start.x
+                p.x - self.start.x
             },
             Orientation::Vertical => {
-                if point.x != self.start.x {
+                if p.x != self.start.x {
                     return false;
                 }
-                point.y - self.start.y
+                p.y - self.start.y
             }
         };
         d >= 0 && d as usize <= self.len
@@ -87,25 +86,4 @@ impl Iterator for LineIter<'_> {
 
         Some(p)
     }
-}
-
-
-
-pub fn transform(path: Vec<path::PathElement>) -> Path {
-    let mut lines: Path = Vec::new();
-    let mut current_pos = Point {x: 0, y: 0};
-
-    for path_element in path.iter() {
-        let end_pos = match path_element.direction {
-            path::Direction::Right => Point::new(current_pos.x + path_element.length as i32, current_pos.y),
-            path::Direction::Left => Point::new(current_pos.x - path_element.length as i32, current_pos.y),
-            path::Direction::Up => Point::new(current_pos.x, current_pos.y + path_element.length as i32),
-            path::Direction::Down => Point::new(current_pos.x, current_pos.y - path_element.length as i32),
-        };
-
-        lines.push(Line::new(current_pos, end_pos).expect("could not create a valid line"));
-        current_pos = end_pos;
-    }
-
-    lines
 }

@@ -1,11 +1,12 @@
 use std::collections::HashSet;
+use std::str::FromStr;
 
 use crate::myerror::MyError;
 use crate::line::Line;
 use crate::point::Point;
-use std::str::FromStr;
 
 pub type Path = Vec<Line>;
+pub type PathRef = [Line];
 
 #[derive(Debug)]
 pub enum Direction {
@@ -52,8 +53,8 @@ impl FromStr for PathElement {
 
 pub fn parse_path(path_data: &str) -> Result<Vec<PathElement>, MyError> {
     let mut parsed:Vec<PathElement> = Vec::new();
-    for line_data in path_data.split(',') {
-        match PathElement::from_str(line_data) {
+    for section in path_data.split(',') {
+        match PathElement::from_str(section) {
             Ok(element) => parsed.push(element),
             Err(e) => return Err(e),
         }
@@ -62,14 +63,43 @@ pub fn parse_path(path_data: &str) -> Result<Vec<PathElement>, MyError> {
 }
 
 
-pub fn find_intersections(path1: &[Line], path2: &[Line]) -> HashSet<Point> {
+pub fn find_intersections(path1: &PathRef, path2: &PathRef) -> HashSet<Point> {
     let mut crossings: HashSet<Point> = HashSet::new();
     for line in path1.iter() {
         for point in line.iter() {
-            if point.is_on_path(path2) {
+            if is_on_path(point, path2) {
                 crossings.insert(point);
             }
         }
     }
     crossings
+}
+
+
+pub fn transform(path_elements: Vec<PathElement>) -> Path {
+    let mut path: Path = Vec::new();
+    let mut current_pos = Point {x: 0, y: 0};
+
+    for path_element in path_elements.iter() {
+        let end_pos = match path_element.direction {
+            Direction::Right => Point::new(current_pos.x + path_element.length as i32, current_pos.y),
+            Direction::Left => Point::new(current_pos.x - path_element.length as i32, current_pos.y),
+            Direction::Up => Point::new(current_pos.x, current_pos.y + path_element.length as i32),
+            Direction::Down => Point::new(current_pos.x, current_pos.y - path_element.length as i32),
+        };
+
+        path.push(Line::new(current_pos, end_pos).expect("could not create a valid line"));
+        current_pos = end_pos;
+    }
+
+    path
+}
+
+fn is_on_path(p: Point, path: &PathRef) -> bool {
+    for line in path.iter() {
+        if line.is_on(&p) {
+            return true;
+        }
+    }
+    false
 }

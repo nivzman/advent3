@@ -36,7 +36,7 @@ fn main() -> Result<(), MyError> {
 
     let (path1, path2) = parse_input(&input_file)?;
 
-    let (path1, path2) = (line::transform(path1), line::transform(path2));
+    let (path1, path2) = (path::transform(path1), path::transform(path2));
 
     let intersections = path::find_intersections(&path1, &path2);
 
