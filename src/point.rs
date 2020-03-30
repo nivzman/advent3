@@ -27,11 +27,16 @@ impl Point {
 }
 
 
-pub fn get_closest<I>(mut points: I) -> Option<Point>
+pub fn get_closest<I>(points: I) -> Option<Point>
         where I: Iterator<Item = Point> {
 
-    let mut min_point = points.next()?;
-    let mut min_distance = min_point.manhaten_distance();
+    let mut points = points.peekable();
+    if points.peek().is_none() {
+        return None;
+    }
+
+    let mut min_point: Option<Point> = None;
+    let mut min_distance: u32 = u32::max_value();
 
     for p in points {
         if p.x == 0 && p.y == 0 {
@@ -40,9 +45,9 @@ pub fn get_closest<I>(mut points: I) -> Option<Point>
         let d = p.manhaten_distance();
         if d < min_distance {
             min_distance = d;
-            min_point = p;
+            min_point = Some(p);
         }
     }
 
-    Some(min_point)
+    min_point
 }

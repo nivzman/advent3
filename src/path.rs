@@ -1,9 +1,9 @@
-use std::fs;
 use std::collections::HashSet;
 
 use crate::myerror::MyError;
 use crate::line::Line;
 use crate::point::Point;
+use std::str::FromStr;
 
 pub type Path = Vec<Line>;
 
@@ -20,17 +20,19 @@ pub struct PathElement {
     pub length: u32,
 }
 
-impl PathElement {
-    pub fn from_str(data: &str) -> Result<PathElement, MyError> {
-        if !data.is_ascii() {
+impl FromStr for PathElement {
+    type Err = MyError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !s.is_ascii() {
             return Err(MyError::new("path data must be ascii encoded"));
         }
 
-        if data.is_empty() {
+        if s.is_empty() {
             return Err(MyError::new("empty line data found"));
         }
 
-        let direction: Direction = match data.as_bytes()[0] as char {
+        let direction: Direction = match s.as_bytes()[0] as char {
             'U' => Direction::Up,
             'D' => Direction::Down,
             'L' => Direction::Left,
@@ -38,7 +40,7 @@ impl PathElement {
             _ => return Err(MyError::new("invalid direction"))
         };
 
-        let length = match data[1..].parse() {
+        let length = match s[1..].parse() {
             Ok(n) => n,
             Err(_) => return Err(MyError::new("invalid length"))
         };
@@ -47,18 +49,6 @@ impl PathElement {
     }
 }
 
-pub fn parse_input(input_file: &str) -> Result<(Vec<PathElement>, Vec<PathElement>), MyError> {
-    let content = fs::read_to_string(input_file)?;
-
-    let paths: Vec<&str> = content.lines().collect();
-    if paths.len() != 2 {
-        return Err(MyError::new("2 paths required"));
-    }
-
-    let path1 = parse_path(paths[0])?;
-    let path2 = parse_path(paths[1])?;
-    Ok((path1, path2))
-}
 
 pub fn parse_path(path_data: &str) -> Result<Vec<PathElement>, MyError> {
     let mut parsed:Vec<PathElement> = Vec::new();

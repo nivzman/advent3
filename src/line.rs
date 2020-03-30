@@ -2,17 +2,15 @@ use std::cmp::min;
 
 use crate::point::Point;
 use crate::myerror::MyError;
-use crate::path;
+use crate::path::{self, Path};
 
-use crate::path::Path;
-
-enum LineOrientation {
+enum Orientation {
     Horizontal,
     Vertical,
 }
 
 pub struct Line {
-    orientation: LineOrientation,
+    orientation: Orientation,
     start: Point,
     len: usize,
 }
@@ -24,11 +22,11 @@ impl Line {
         }
 
         let (orientation, start, len) = if start.x == end.x {
-            (LineOrientation::Vertical,
+            (Orientation::Vertical,
              Point::new(start.x, min(start.y, end.y)),
              (end.y - start.y).abs() as usize)
         } else if start.y == end.y {
-            (LineOrientation::Horizontal,
+            (Orientation::Horizontal,
              Point::new(min(start.x, end.x), start.y),
              (end.x - start.x).abs() as usize)
         } else {
@@ -46,13 +44,13 @@ impl Line {
 
     pub fn is_on(&self, point: &Point) -> bool {
         let d = match self.orientation {
-            LineOrientation::Horizontal => {
+            Orientation::Horizontal => {
                 if point.y != self.start.y {
                     return false;
                 }
                 point.x - self.start.x
             },
-            LineOrientation::Vertical => {
+            Orientation::Vertical => {
                 if point.x != self.start.x {
                     return false;
                 }
@@ -82,8 +80,8 @@ impl Iterator for LineIter<'_> {
 
         let mut p = self._ref.start.clone();
         match self._ref.orientation {
-            LineOrientation::Horizontal => p.x += self.current_pos as i32,
-            LineOrientation::Vertical => p.y += self.current_pos as i32,
+            Orientation::Horizontal => p.x += self.current_pos as i32,
+            Orientation::Vertical => p.y += self.current_pos as i32,
         }
         self.current_pos += 1;
 
@@ -105,7 +103,7 @@ pub fn transform(path: Vec<path::PathElement>) -> Path {
             path::Direction::Down => Point::new(current_pos.x, current_pos.y - path_element.length as i32),
         };
 
-        lines.push(Line::new(current_pos.clone(), end_pos.clone()).unwrap());
+        lines.push(Line::new(current_pos, end_pos).expect("could not create a valid line"));
         current_pos = end_pos;
     }
 

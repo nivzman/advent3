@@ -1,4 +1,5 @@
 use std::env;
+use std::fs;
 
 mod point;
 mod line;
@@ -15,10 +16,25 @@ pub fn input_file() -> Result<String, MyError> {
     Ok(args[1].clone())
 }
 
+
+pub fn parse_input(input_file: &str) -> Result<(Vec<path::PathElement>, Vec<path::PathElement>), MyError> {
+    let content = fs::read_to_string(input_file)?;
+
+    let paths: Vec<&str> = content.lines().collect();
+    if paths.len() != 2 {
+        return Err(MyError::new("2 paths required"));
+    }
+
+    let path1 = path::parse_path(paths[0])?;
+    let path2 = path::parse_path(paths[1])?;
+    Ok((path1, path2))
+}
+
+
 fn main() -> Result<(), MyError> {
     let input_file = input_file()?;
 
-    let (path1, path2) = path::parse_input(&input_file)?;
+    let (path1, path2) = parse_input(&input_file)?;
 
     let (path1, path2) = (line::transform(path1), line::transform(path2));
 
