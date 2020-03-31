@@ -14,24 +14,23 @@ impl Point {
     pub fn manhaten_distance(&self) -> u32 {
         self.x.abs() as u32 + self.y.abs() as u32
     }
+
+    pub fn is_zero(&self) -> bool {
+        self.x == 0 && self.y == 0
+    }
 }
 
 
 pub fn get_closest<I, T>(points: I) -> Option<T>
-        where I: Iterator<Item = T>,
+        where I: IntoIterator<Item = T>,
               T: Borrow<Point> {
 
-    let mut points = points.peekable();
-    if points.peek().is_none() {
-        return None;
-    }
-
     let mut min_point: Option<T> = None;
-    let mut min_distance: u32 = u32::max_value();
+    let mut min_distance = u32::max_value();
 
     for p in points {
         let p2 = p.borrow();
-        if p2.x == 0 && p2.y == 0 {
+        if p2.is_zero() {
             continue;
         }
         let d = p2.manhaten_distance();

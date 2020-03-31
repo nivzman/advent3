@@ -16,8 +16,8 @@ pub struct Line {
     len: usize,
 }
 
-static IDENTICAL_POINTS_ERR: &str = "identical points can not make a line";
-static LINE_ORIENTATION_ERR: &str = "line must be horizontal or vertical";
+const IDENTICAL_POINTS_ERR: &str = "identical points can not make a line";
+const LINE_ORIENTATION_ERR: &str = "line must be horizontal or vertical";
 
 impl Line {
     pub fn new(start: Point, end: Point) -> Result<Line, MyError> {

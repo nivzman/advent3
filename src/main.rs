@@ -7,6 +7,7 @@ mod path;
 mod myerror;
 
 use myerror::MyError;
+use path::PathElement;
 
 pub fn input_file() -> Result<String, MyError> {
     let args: Vec<String> = env::args().collect();
@@ -17,7 +18,7 @@ pub fn input_file() -> Result<String, MyError> {
 }
 
 
-pub fn parse_input(input_file: &str) -> Result<(Vec<path::PathElement>, Vec<path::PathElement>), MyError> {
+pub fn parse_input(input_file: &str) -> Result<(Vec<PathElement>, Vec<PathElement>), MyError> {
     let content = fs::read_to_string(input_file)?;
 
     let paths: Vec<&str> = content.lines().collect();
